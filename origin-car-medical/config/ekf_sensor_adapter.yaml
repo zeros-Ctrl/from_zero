@@ -1,0 +1,52 @@
+ekf_sensor_adapter:
+  ros__parameters:
+    odom_input_topic: /odom
+    imu_input_topic: /imu/data
+    odom_output_topic: /odom_ekf_input
+    imu_output_topic: /imu_ekf_input
+    odom_frame: odom_ekf_test
+    base_frame: base_footprint
+    imu_frame: gyro_link
+
+    # BMI088 is the only absolute-yaw observation. Wheel yaw is consumed by a
+    # second differential odom input as a weak backup turn increment, avoiding
+    # two absolute-yaw sources oscillating. Its higher variance reflects the
+    # measured 6-9% scan-to-map turn error.
+    # The adapter keeps publishing wheel pose for diagnostics, but the current
+    # EKF config deliberately ignores its absolute x/y and consumes velocity.
+    odom_position_variance: 0.0025
+    # During turns, wheel-yaw geometry error primarily corrupts displacement
+    # lateral to the vehicle. The adapter rotates this body-axis covariance
+    # into odom x/y before robot_localization performs the correction.
+    # Keep wheel x/y confidence fixed. The 2026-07-19 adaptive lateral
+    # inflation changed normal y without resolving the route-turn defect.
+    odom_turn_lateral_position_variance: 0.0025
+    odom_slip_lateral_position_variance: 0.0025
+    odom_yaw_variance: 0.03
+    odom_forward_velocity_variance: 0.01
+    odom_slip_forward_velocity_variance: 0.01
+    # Ackermann non-holonomic constraint: body-frame lateral speed is zero.
+    odom_lateral_velocity_variance: 0.0004
+    adaptive_turn_rate_start: 0.08
+    adaptive_turn_rate_full: 0.30
+    # After removing gravity, ideal Ackermann motion has ay ~= vx*wz.
+    # A larger residual reduces confidence in encoder pose and forward speed.
+    adaptive_slip_residual_start: 0.12
+    adaptive_slip_residual_full: 0.45
+    adaptive_imu_timeout: 0.20
+    # Aligned IMU yaw is the primary absolute heading. The first sample is
+    # anchored to the first wheel-odom yaw, then subsequent changes come from
+    # the more accurate BMI088. Same-start scan-to-map trials gave scale
+    # estimates around 0.969..0.972, so scale the continuous unwrapped yaw
+    # increment and yaw rate, never the absolute wrapped angle.
+    imu_yaw_scale: 0.971
+    imu_yaw_variance: 0.001
+    # Mandatory fallback when the source publishes a zero/invalid covariance.
+    imu_zero_yaw_variance_floor: 0.0000000289
+    imu_yaw_rate_variance: 0.0001
+    # The BMI088 topic contains gravity. robot_localization removes it using
+    # the preserved Mahony roll/pitch before fusing ax/ay.
+    imu_forward_acceleration_variance: 0.09
+    # Ackermann turns have real centripetal ay=v*w; keep this observation more
+    # conservative than longitudinal acceleration.
+    imu_lateral_acceleration_variance: 0.25

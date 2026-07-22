@@ -1,0 +1,43 @@
+{
+  "name": "origin-car-medical",
+  "version": "1.0.0",
+  "description": "Origincar 自主巡航导航堆栈 — ROS 2 Humble + Nav2 MPPI + Smac Hybrid-A* + slam_toolbox 定位",
+  "main": "src/navigation/cruise_mission.py",
+  "scripts": {
+    "start": "bash scripts/start_stack.sh",
+    "start:simple": "bash scripts/start_simple_ekf_cruise.sh",
+    "start:obstacle": "bash scripts/start_simple_obstacle_cruise.sh",
+    "start:inertial": "bash scripts/start_inertial_ekf_cruise.sh",
+    "start:slam-corrected": "bash scripts/start_slam_corrected_cruise.sh",
+    "start:nav2-test": "bash scripts/start_nav2_obstacle_cruise_test.sh",
+    "start:lidar-test": "bash scripts/start_lidar_localization_test.sh",
+    "start:ekf-test": "bash scripts/start_ekf_lidar_localization_test.sh",
+    "test": "python -m pytest tests/",
+    "validate": "python src/tools/validate_config.py"
+  },
+  "files": [
+    "src/",
+    "config/",
+    "launch/",
+    "scripts/",
+    "tests/",
+    "rviz/",
+    "docs/"
+  ],
+  "keywords": [
+    "ros2",
+    "nav2",
+    "mppi",
+    "autonomous-driving",
+    "ackermann",
+    "origincar",
+    "race-car"
+  ],
+  "author": "",
+  "license": "MIT",
+  "nodehub": {
+    "type": "ros2-package",
+    "rosDistro": "humble",
+    "entrypoint": "launch/bringup.launch.py"
+  }
+}
